@@ -26,6 +26,9 @@ ios/Flutter/flutter_export_environment.sh
 
 # Firebase
 **/serviceAccountKey.json
+**/google-services.json
+**/firebase-config.js
+**/GoogleService-Info.plist
 firebase-debug.log
 .firebase/
 

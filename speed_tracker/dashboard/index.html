@@ -406,21 +406,15 @@
         </div>
     </div>
 
+    <!-- Firebase config loaded from external file (gitignored). Copy firebase-config.example.js to firebase-config.js -->
+    <script src="firebase-config.js"></script>
     <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBHxUHZNpUJTWJg4PLEcuobipMu5npNVDM",
-            authDomain: "speed-measure-2.firebaseapp.com",
-            projectId: "speed-measure-2",
-            storageBucket: "speed-measure-2.firebasestorage.app",
-            messagingSenderId: "750345818987",
-            appId: "1:750345818987:web:47e58702dddef618d9b22e",
-            measurementId: "G-0V7MXBGEKS"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        // Initialize Firebase (config from firebase-config.js)
+        if (typeof firebaseConfig === 'undefined') {
+            document.body.innerHTML = '<div class="error"><p>Missing firebase-config.js. Copy firebase-config.example.js to firebase-config.js and add your Firebase credentials.</p></div>';
+        } else {
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
 
         // Get trip ID from URL
         const urlPath = window.location.pathname;
@@ -705,8 +699,9 @@
             `;
         }
 
-        // Load data on page load
-        loadTripData();
+            // Load data on page load
+            loadTripData();
+        }
     </script>
 </body>
 

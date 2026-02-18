@@ -32,7 +32,14 @@ speed_tracker/
     └── all_routes.json    # Route backup
 ```
 
-## Quick Start
+## Setup (Keys & Config)
+
+**Don't commit real keys.** Use the example files and add your credentials locally:
+
+| File | Action |
+|------|--------|
+| `android/app/google-services.json` | Copy from `google-services.json.example`, fill in from [Firebase Console](https://console.firebase.google.com) |
+| `dashboard/firebase-config.js` | Copy from `firebase-config.example.js`, add your Firebase web config |
 
 ### 1. Flutter App
 ```bash
@@ -51,6 +58,7 @@ firebase deploy --only functions
 ### 3. Deploy Dashboard
 ```bash
 cd dashboard
+# Ensure firebase-config.js exists (copy from firebase-config.example.js with your credentials)
 firebase deploy --only hosting
 ```
 

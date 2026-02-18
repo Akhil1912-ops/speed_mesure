@@ -1,0 +1,30 @@
+{
+    "hosting": {
+        "site": "security-dashboard",
+        "public": ".",
+        "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**",
+            "serve.py",
+            "start_server.bat"
+        ],
+        "rewrites": [
+            {
+                "source": "**",
+                "destination": "/index.html"
+            }
+        ],
+        "headers": [
+            {
+                "source": "**",
+                "headers": [
+                    {
+                        "key": "Cache-Control",
+                        "value": "max-age=0"
+                    }
+                ]
+            }
+        ]
+    }
+}

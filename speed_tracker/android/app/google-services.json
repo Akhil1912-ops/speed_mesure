@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "750345818987",
+    "project_id": "speed-measure-2",
+    "storage_bucket": "speed-measure-2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:750345818987:android:24a2870938cfb8ded9b22e",
+        "android_client_info": {
+          "package_name": "com.campus.speed_tracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEXoeQzWypOd8VKbYhrI-RDZ30bcI1LdU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Speed Tracker — Project Showcase</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #fafafa;
+            color: #1a1a1a;
+            line-height: 1.6;
+            padding: 2rem;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        section {
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #888;
+            margin-bottom: 0.75rem;
+        }
+
+        p {
+            font-size: 0.95rem;
+            color: #444;
+        }
+
+        .flow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .flow span {
+            background: #fff;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            border: 1px solid #e5e5e5;
+        }
+
+        .tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tech span {
+            background: #f0f0f0;
+            padding: 0.35rem 0.7rem;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            color: #555;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #e8e8e8;
+            margin: 2rem 0;
+        }
+
+        footer {
+            font-size: 0.8rem;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <h1>Campus Speed Tracker</h1>
+    <p class="subtitle">Flutter mobile app with automated route verification for campus vehicle monitoring</p>
+
+    <section>
+        <h2>What it does</h2>
+        <p>Records vehicle trips via GPS, enforces a 30 km/h campus speed limit, verifies routes against approved paths, and generates a QR code for security to scan at the exit gate.</p>
+    </section>
+
+    <section>
+        <h2>Flow</h2>
+        <div class="flow">
+            <span>1. Record trip</span>
+            <span>→</span>
+            <span>2. Upload to Firebase</span>
+            <span>→</span>
+            <span>3. Auto-verify route</span>
+            <span>→</span>
+            <span>4. Get QR code</span>
+            <span>→</span>
+            <span>5. Security scans & decides</span>
+        </div>
+    </section>
+
+    <section>
+        <h2>Tech stack</h2>
+        <div class="tech">
+            <span>Flutter</span>
+            <span>Firebase</span>
+            <span>Firestore</span>
+            <span>Cloud Functions</span>
+            <span>Firebase Storage</span>
+            <span>OpenStreetMap</span>
+        </div>
+    </section>
+
+    <section>
+        <h2>Features</h2>
+        <p>Real-time GPS speed tracking, color-coded route map (green/orange/red by speed), buffer-based route matching, penalty calculation, and a web dashboard for security review.</p>
+    </section>
+
+    <hr>
+
+    <footer>Project for campus vehicle speed monitoring</footer>
+</body>
+</html>

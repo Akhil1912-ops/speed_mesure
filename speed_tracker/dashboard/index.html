@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Speed Tracker - Security Dashboard</title>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Trip Info Section */
+        .trip-info {
+            padding: 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .trip-header {
+            margin-bottom: 15px;
+        }
+
+        .trip-id {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .timestamp {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Map Section */
+        .map-section {
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .map-container {
+            width: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .map-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Trip Statistics Section */
+        .statistics {
+            padding: 30px;
+            background: white;
+        }
+
+        .stats-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .parameter-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid #ddd;
+            transition: all 0.3s;
+        }
+
+        .parameter-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .parameter-card.ok {
+            border-left-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .parameter-card.wrong {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .parameter-info {
+            flex: 1;
+        }
+
+        .parameter-label {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .parameter-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .parameter-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .status-ok {
+            color: #28a745;
+        }
+
+        .status-wrong {
+            color: #dc3545;
+        }
+
+        .status-icon {
+            font-size: 24px;
+        }
+
+        /* Final Summary */
+        .summary {
+            padding: 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-top: 3px solid #ddd;
+            text-align: center;
+        }
+
+        .summary-title {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .summary-result {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .summary-result.approved {
+            color: #28a745;
+        }
+
+        .summary-result.rejected {
+            color: #dc3545;
+        }
+
+        .summary-count {
+            font-size: 20px;
+            color: #666;
+        }
+
+        /* Route Verification Section */
+        .route-verification {
+            padding: 30px;
+            background: white;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .verification-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .verification-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .verification-item:last-child {
+            border-bottom: none;
+        }
+
+        .verification-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .verification-value {
+            color: #666;
+        }
+
+        .verification-value.success {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .verification-value.danger {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        /* Automated Results */
+        .automated-results {
+            padding: 30px;
+            background: #fff9f0;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .result-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 5px solid #667eea;
+        }
+
+        .result-header {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .result-details {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        /* Action Buttons */
+        .actions {
+            padding: 30px;
+            background: white;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-approve {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-warn {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-deny {
+            background: #dc3545;
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .actions {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+            }
+
+            .parameter-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .parameter-status {
+                align-self: flex-end;
+            }
+        }
+
+        /* Error State */
+        .error {
+            text-align: center;
+            padding: 60px 20px;
+            color: #dc3545;
+        }
+
+        .error-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 Campus Speed Tracker</h1>
+            <p>Security Dashboard</p>
+        </div>
+
+        <div id="content">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading trip data...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHxUHZNpUJTWJg4PLEcuobipMu5npNVDM",
+            authDomain: "speed-measure-2.firebaseapp.com",
+            projectId: "speed-measure-2",
+            storageBucket: "speed-measure-2.firebasestorage.app",
+            messagingSenderId: "750345818987",
+            appId: "1:750345818987:web:47e58702dddef618d9b22e",
+            measurementId: "G-0V7MXBGEKS"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Get trip ID from URL
+        const urlPath = window.location.pathname;
+        const tripId = urlPath.split('/').pop();
+
+        // Verification Rules
+        const VERIFICATION_RULES = {
+            distance: { max: 4, unit: 'km' },
+            avgSpeed: { max: 30, unit: 'km/h' },
+            maxSpeed: { max: 30, unit: 'km/h' },
+            duration: { max: 25, unit: 'mins' },
+            violations: { max: 0, unit: '' }
+        };
+
+        // Check parameter status
+        function checkParameter(name, value, rule) {
+            let passed = false;
+            if (name === 'violations') {
+                passed = value <= rule.max;
+            } else if (name === 'duration') {
+                const minutes = Math.floor(value / 60);
+                passed = minutes < rule.max;
+            } else {
+                passed = value < rule.max;
+            }
+            return { passed, value };
+        }
+
+        // Load trip data
+        async function loadTripData() {
+            try {
+                const doc = await db.collection('trips').doc(tripId).get();
+
+                if (!doc.exists) {
+                    showError('Trip not found');
+                    return;
+                }
+
+                const trip = doc.data();
+                displayTripData(trip);
+            } catch (error) {
+                showError('Error loading trip: ' + error.message);
+            }
+        }
+
+        function displayTripData(trip) {
+            // Calculate parameter checks
+            const distance = trip.total_distance || 0;
+            const avgSpeed = trip.avg_speed || 0;
+            const maxSpeed = trip.max_speed || 0;
+            const duration = trip.duration || 0;
+            const violations = trip.violations_count || 0;
+
+            const checks = {
+                distance: checkParameter('distance', distance, VERIFICATION_RULES.distance),
+                avgSpeed: checkParameter('avgSpeed', avgSpeed, VERIFICATION_RULES.avgSpeed),
+                maxSpeed: checkParameter('maxSpeed', maxSpeed, VERIFICATION_RULES.maxSpeed),
+                duration: checkParameter('duration', duration, VERIFICATION_RULES.duration),
+                violations: checkParameter('violations', violations, VERIFICATION_RULES.violations)
+            };
+
+            // Count passed checks
+            const passedCount = Object.values(checks).filter(c => c.passed).length;
+            const totalCount = Object.keys(checks).length;
+            const allPassed = passedCount === totalCount;
+
+            // Format duration
+            const durationMins = Math.floor(duration / 60);
+            const durationSecs = duration % 60;
+
+            // Build parameter cards HTML
+            const parameterCards = `
+                <div class="parameter-card ${checks.distance.passed ? 'ok' : 'wrong'}">
+                    <div class="parameter-info">
+                        <div class="parameter-label">Distance</div>
+                        <div class="parameter-value">${distance.toFixed(2)} km</div>
+                    </div>
+                    <div class="parameter-status ${checks.distance.passed ? 'status-ok' : 'status-wrong'}">
+                        <span class="status-icon">${checks.distance.passed ? '✅' : '❌'}</span>
+                        <span>${checks.distance.passed ? 'OK' : 'WRONG'}</span>
+                    </div>
+                </div>
+
+                <div class="parameter-card ${checks.avgSpeed.passed ? 'ok' : 'wrong'}">
+                    <div class="parameter-info">
+                        <div class="parameter-label">Average Speed</div>
+                        <div class="parameter-value">${avgSpeed.toFixed(1)} km/h</div>
+                    </div>
+                    <div class="parameter-status ${checks.avgSpeed.passed ? 'status-ok' : 'status-wrong'}">
+                        <span class="status-icon">${checks.avgSpeed.passed ? '✅' : '❌'}</span>
+                        <span>${checks.avgSpeed.passed ? 'OK' : 'WRONG'}</span>
+                    </div>
+                </div>
+
+                <div class="parameter-card ${checks.maxSpeed.passed ? 'ok' : 'wrong'}">
+                    <div class="parameter-info">
+                        <div class="parameter-label">Maximum Speed</div>
+                        <div class="parameter-value">${maxSpeed.toFixed(1)} km/h</div>
+                    </div>
+                    <div class="parameter-status ${checks.maxSpeed.passed ? 'status-ok' : 'status-wrong'}">
+                        <span class="status-icon">${checks.maxSpeed.passed ? '✅' : '❌'}</span>
+                        <span>${checks.maxSpeed.passed ? 'OK' : 'WRONG'}</span>
+                    </div>
+                </div>
+
+                <div class="parameter-card ${checks.duration.passed ? 'ok' : 'wrong'}">
+                    <div class="parameter-info">
+                        <div class="parameter-label">Duration</div>
+                        <div class="parameter-value">${durationMins} min ${durationSecs} sec</div>
+                    </div>
+                    <div class="parameter-status ${checks.duration.passed ? 'status-ok' : 'status-wrong'}">
+                        <span class="status-icon">${checks.duration.passed ? '✅' : '❌'}</span>
+                        <span>${checks.duration.passed ? 'OK' : 'WRONG'}</span>
+                    </div>
+                </div>
+
+                <div class="parameter-card ${checks.violations.passed ? 'ok' : 'wrong'}">
+                    <div class="parameter-info">
+                        <div class="parameter-label">Violations</div>
+                        <div class="parameter-value">${violations}</div>
+                    </div>
+                    <div class="parameter-status ${checks.violations.passed ? 'status-ok' : 'status-wrong'}">
+                        <span class="status-icon">${checks.violations.passed ? '✅' : '❌'}</span>
+                        <span>${checks.violations.passed ? 'OK' : 'WRONG'}</span>
+                    </div>
+                </div>
+            `;
+
+            // Route detection HTML
+            let routeDetectionHtml = '';
+            if (trip.route_detection) {
+                if (trip.route_detection.detected) {
+                    routeDetectionHtml = `
+                        <div class="verification-item">
+                            <span class="verification-label">Detected Route:</span>
+                            <span class="verification-value success">${trip.route_detection.displayName || trip.route_detection.routeName || 'N/A'}</span>
+                        </div>
+                        <div class="verification-item">
+                            <span class="verification-label">Match Confidence:</span>
+                            <span class="verification-value">${trip.route_detection.matchScore || 'N/A'}/100</span>
+                        </div>
+                    `;
+                } else {
+                    routeDetectionHtml = `
+                        <div class="verification-item">
+                            <span class="verification-label">Route Detection:</span>
+                            <span class="verification-value danger">Not Detected</span>
+                        </div>
+                        <div class="verification-item">
+                            <span class="verification-label">Best Match Score:</span>
+                            <span class="verification-value">${trip.route_detection.bestScore?.toFixed(1) || 'N/A'}/100</span>
+                        </div>
+                    `;
+                }
+            }
+
+            // Automated verification results
+            let automatedResultsHtml = '';
+            if (trip.verification_result) {
+                const routeCheck = trip.verification_result.route_check || {};
+                const distanceCheck = trip.verification_result.distance_check || {};
+                const penalty = trip.verification_result.penalty || {};
+                const verdict = trip.verification_result.verdict || {};
+
+                automatedResultsHtml = `
+                    <div class="result-card">
+                        <div class="result-header">🤖 Automated Verification Results</div>
+                        <div class="result-details">
+                            <strong>Route Check:</strong> ${routeCheck.passed ? '✅ Passed' : '❌ Failed'} 
+                            (${((routeCheck.insideRatio || 0) * 100).toFixed(1)}% points inside corridor)<br>
+                            <strong>Distance Check:</strong> ${distanceCheck.passed ? '✅ Passed' : '❌ Failed'} 
+                            (Ratio: ${(distanceCheck.ratio || 0).toFixed(2)})<br>
+                            <strong>Total Penalty:</strong> ₹${penalty.totalPenalty || 0}<br>
+                            <strong>Auto Score:</strong> ${trip.auto_score || 'N/A'}/100<br>
+                            <strong>Auto Verdict:</strong> ${trip.auto_verdict || 'N/A'}<br>
+                            ${trip.verification_result.matched_route ? 
+                                `<strong>Matched Route:</strong> ${trip.verification_result.matched_route.displayName || trip.verification_result.matched_route.name || 'N/A'}` 
+                                : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            const html = `
+                <div class="trip-info">
+                    <div class="trip-header">
+                        <div class="trip-id">Trip ID: ${trip.trip_id}</div>
+                        <div class="timestamp">${formatTimestamp(trip.timestamp)}</div>
+                    </div>
+                </div>
+
+                <div class="map-section">
+                    <div class="map-container">
+                        <img src="${trip.map_image_url}" alt="Route Map" />
+                    </div>
+                </div>
+
+                <div class="statistics">
+                    <div class="stats-title">📊 Trip Statistics</div>
+                    ${parameterCards}
+                </div>
+
+                <div class="summary">
+                    <div class="summary-title">Final Verification Summary</div>
+                    <div class="summary-result ${allPassed ? 'approved' : 'rejected'}">
+                        ${allPassed ? '✅ APPROVED' : '❌ REJECTED'}
+                    </div>
+                    <div class="summary-count">${passedCount}/${totalCount} Parameters Passed</div>
+                </div>
+
+                <div class="route-verification">
+                    <div class="section-title">🗺️ Route Detection & Verification</div>
+                    <div class="verification-card">
+                        ${routeDetectionHtml || '<div class="verification-item"><span class="verification-label">Route Detection:</span><span class="verification-value">Not Available</span></div>'}
+                    </div>
+                </div>
+
+                ${automatedResultsHtml ? `
+                <div class="automated-results">
+                    <div class="section-title">🤖 Automated Verification</div>
+                    ${automatedResultsHtml}
+                </div>
+                ` : ''}
+
+                <div class="actions">
+                    <button class="action-btn btn-approve" onclick="takeAction('approved', '✅')">
+                        ✅ Approve Entry
+                    </button>
+                    <button class="action-btn btn-warn" onclick="takeAction('warning', '⚠️')">
+                        ⚠️ Issue Warning
+                    </button>
+                    <button class="action-btn btn-deny" onclick="takeAction('denied', '❌')">
+                        ❌ Deny Entry
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('content').innerHTML = html;
+        }
+
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+
+        async function takeAction(action, emoji) {
+            const confirmed = confirm(`${emoji} Confirm action: ${action.toUpperCase()}?`);
+            if (!confirmed) return;
+
+            const buttons = document.querySelectorAll('.action-btn');
+            buttons.forEach(btn => btn.disabled = true);
+
+            try {
+                await db.collection('trips').doc(tripId).update({
+                    action_taken: action,
+                    reviewed_by: 'Security',
+                    reviewed_at: new Date().toISOString()
+                });
+
+                alert(`${emoji} Action recorded: ${action.toUpperCase()}`);
+                location.reload();
+            } catch (error) {
+                alert('Error: ' + error.message);
+                buttons.forEach(btn => btn.disabled = false);
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('content').innerHTML = `
+                <div class="error">
+                    <div class="error-icon">❌</div>
+                    <h2>Error</h2>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        // Load data on page load
+        loadTripData();
+    </script>
+</body>
+
+</html>

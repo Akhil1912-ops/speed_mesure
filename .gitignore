@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Secrets - NEVER commit these
+**/serviceAccountKey.json
+.env
+*.log
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

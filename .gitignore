@@ -1,6 +1,14 @@
 # Dependencies
 node_modules/
 
+# Unwanted / test projects
+test_basic/
+
+# Build outputs (backup - speed_tracker also has these)
+build/
+*.apk
+*.aab
+
 # Secrets - NEVER commit these
 **/serviceAccountKey.json
 .env
